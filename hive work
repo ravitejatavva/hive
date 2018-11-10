@@ -44,3 +44,19 @@ OK
 3
 
 select word_split, count(*) from select explode(split(word,",")) as word_split from occur)word_cnt group by word_split;
+
+
+SELECT resource_id,
+CASE WHEN COLLECT_SET(quarter_1)[0] IS NULL THEN 0 ELSE COLLECT_SET(quarter_1)[0] END AS quarter_1_spends,
+CASE WHEN COLLECT_SET(quarter_2)[0] IS NULL THEN 0 ELSE COLLECT_SET(quarter_2)[0] END AS quarter_2_spends,
+CASE WHEN COLLECT_SET(quarter_3)[0] IS NULL THEN 0 ELSE COLLECT_SET(quarter_3)[0] END AS quarter_3_spends,
+CASE WHEN COLLECT_SET(quarter_4)[0] IS NULL THEN 0 ELSE COLLECT_SET(quarter_4)[0] END AS quarter_4_spends
+FROM (
+SELECT resource_id,
+CASE WHEN quarter='Q1' THEN amount END AS quarter_1,
+CASE WHEN quarter='Q2' THEN amount END AS quarter_2,
+CASE WHEN quarter='Q3' THEN amount END AS quarter_3,
+CASE WHEN quarter='Q4' THEN amount END AS quarter_4
+FROM billing_info)tbl1
+GROUP BY resource_id;
+
