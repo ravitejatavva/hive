@@ -1,0 +1,23 @@
+unpivoting -- transpose columns into rows of a table
+create table unpivot(id string,yes string,no string) row format delimited fields terminated by ',' lines terminated by '\n' stored as textfile;
+load data local inpath '/home/cloudera/unpivot' into table unpivot;
+
+hive> select * from unpivot;
+OK
+bash: n: command not found	NULL	NULL
+001	21	11
+002 9   89
+003	10	90
+
+select id, bool, val from (select id, MAP('yes', yes, 'no', no) as tmp_column from unpivot)x lateral view explode(tmp_column) exp_tbl as bool,val;
+
+hive> select id, bool, val from (select id, MAP('yes', yes, 'no', no) as tmp_column from unpivot)x lateral view explode(tmp_column) exp_tbl as bool,val;
+OK
+
+001	yes	21
+001	no	11
+002	yes	9
+002	no	89
+003	yes	10
+003	no	90
+
